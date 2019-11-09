@@ -68,6 +68,7 @@ enduro_server.prototype.run = async function (server_setup) {
 
 	if (enduro.flags.cluster && cluster.isMaster) {
 		console.log('clustering enduro..');
+        cluster.schedulingPolicy = cluster.SCHED_RR;
         if (!server_setup.development_mode && !enduro.flags.nocompile) {
             await enduro.actions.render();
         }
