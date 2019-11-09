@@ -10,6 +10,7 @@ const Promise = require('bluebird')
 const fs = require('fs')
 const async = require('async')
 const glob = require('glob')
+const _ = require('lodash')
 
 // * enduro dependencies
 const logger = require(enduro.enduro_path + '/libs/logger')
@@ -52,6 +53,10 @@ components_handler.prototype.read_components = function () {
 					callback()
 				})
 			}, function () {
+
+				_.forEach(enduro.templating_engine.partials, function (v, k) {
+                    enduro.templating_engine.partials[k] = enduro.templating_engine.compile(v)
+				})
 
 				// after all components are loaded
 				logger.line('enduro_render_events')

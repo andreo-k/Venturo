@@ -11,6 +11,10 @@ module.exports = {
 			alias: 'p',
 			describe: 'sets the production port'
 		},
+        'cluster': {
+            alias: 'c',
+            describe: 'start in cluster mode'
+        },
 		'path': {
 			describe: 'set the path to the enduro.js project',
 			default: '',
