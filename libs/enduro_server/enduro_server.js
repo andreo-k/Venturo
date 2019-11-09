@@ -23,6 +23,7 @@ const trollhunter = require(enduro.enduro_path + '/libs/trollhunter')
 const logger = require(enduro.enduro_path + '/libs/logger')
 const ab_tester = require(enduro.enduro_path + '/libs/ab_testing/ab_tester')
 const brick_handler = require(enduro.enduro_path + '/libs/bricks/brick_handler')
+const global_data = require(enduro.enduro_path + '/libs/global_data')
 const components_handler = require(enduro.enduro_path + '/libs/components_handler')
 const helper_handler = require(enduro.enduro_path + '/libs/helper_handler')
 
@@ -63,9 +64,6 @@ enduro_server.prototype.run = async function (server_setup) {
 	// overrides the port by system environment variable
 	enduro.config.port = process.env.PORT || enduro.flags.port || enduro.config.port || 5000
 
-	await components_handler.read_components()
-	await helper_handler.read_helpers()
-
 	if (enduro.flags.cluster && cluster.isMaster) {
 		console.log('clustering enduro..');
         cluster.schedulingPolicy = cluster.SCHED_RR;
@@ -78,7 +76,12 @@ enduro_server.prototype.run = async function (server_setup) {
         return;
 	}
 
-    console.log('Enduro worker %d running!', cluster.worker.id);
+	if (enduro.flags.cluster && !cluster.isMaster) {
+        console.log('Enduro worker %d running!', cluster.worker.id);
+        await global_data.get_global_data();
+        await components_handler.read_components()
+        await helper_handler.read_helpers()
+    }
 
     if (!server_setup.development_mode && !enduro.flags.nocompile && (!enduro.flags.cluster || cluster.isMaster)) {
         await enduro.actions.render();
